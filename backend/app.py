@@ -15,6 +15,16 @@ app.config['UPLOAD_FOLDER'] = './uploads'
 
 db = SQLAlchemy(app)
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(15), nullable=False)
+    profile_image = db.Column(db.String(200), nullable=False)
+
+# Crear las tablas
+with app.app_context():
+    db.create_all()
 
 
 # Ruta para registro

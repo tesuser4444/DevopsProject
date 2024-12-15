@@ -72,7 +72,7 @@ const RegistrationForm = () => {
     form.append("profile_image", profileImage);
 
     try {
-      const response = await axios.post("http://localhost:8080/register", form);
+      const response = await axios.post("http://localhost:8081/register", form);
       setMessage(response.data.message);
       setErrors({});
     } catch (error) {

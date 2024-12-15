@@ -1,20 +1,32 @@
-# Use Node.js as the base image
-FROM node:18
+# it's a good idea to pin this, but for demo purposes we'll leave it as is
+FROM node:latest as builder
 
-# Set working directory
-WORKDIR /app
+# automatically creates the dir and sets it as the current working dir
+WORKDIR /usr/src/app
+# this will allow us to run vite and other tools directly
+ENV PATH /usr/src/node_modules/.bin:$PATH
 
-# Copy package.json and install dependencies
-COPY package.json package-lock.json ./
+# inject all environment vars we'll need
+ARG VITE_BACKEND_URL
+# expose the variable to the finished cotainer
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
+COPY package.json ./
+
 RUN npm install
 
-# Copy the rest of the application
-COPY . .
+# use a more specific COPY, as this will include files like `Dockerfile`, we don't really need inside our containers.
+COPY . ./
 
-# Build the React app
+FROM builder as dev
+CMD ["npm", "run", "dev"]
 
-# Expose the app on port 3000
-EXPOSE 8080
+FROM builder as prod-builder
+RUN npm run build
 
-# Run the React app
-CMD ["npm", "run", "dev", "--", "--host"]
+# it's a good idea to pin this, but for demo purposes we'll leave it as is
+FROM nginx:latest as prod
+
+COPY --from=prod-builder /usr/src/app/dist /usr/share/nginx/html
+
+CMD ["nginx", "-g", "daemon off;"]
