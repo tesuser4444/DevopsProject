@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jenkinsfile-config
+data:
+  Jenkinsfile: |
+    pipeline{
+        agent any
+        stages{
+            stage('Verificar tool'){
+                steps{
+                    sh 'docker info'
+                }
+            }
+            stage('Build docker image'){
+                steps{
+                    sh 'docker build -t avatares-dev-jenkins-backend ./api/'
+                }
+            }
+            stage('Run docker image'){
+                steps{
+                    sh 'docker run -dit --name avatares-dev-jenkins-backend avatares-dev-jenkins-backend'
+                }
+            }
+            stage('Run specs'){
+                steps{
+                    sh 'docker exec avatares-dev-jenkins-backend python test.py'
+                }
+            }
+
+        }
+        post{
+            always{
+                sh 'docker stop avatares-dev-jenkins-backend'
+                sh 'docker rm avatares-dev-jenkins-backend'
+            }
+            success {
+                echo 'Pipeline succeeded!'
+            }
+        }
+    }

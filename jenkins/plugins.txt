@@ -1,0 +1,6 @@
+git:5.6.0
+docker-plugin:1.7.0
+docker-commons:445.v6b_646c962a_94
+kubernetes:4302.va_756e4b_67715
+azure-credentials:343.vd80f9c4859df
+terraform:1.0.10
