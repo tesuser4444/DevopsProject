@@ -1,22 +1,22 @@
 services:
-  backend:
-    build:
-      context: ../backend
-    container_name: backend
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./backend/uploads:/app/uploads
+  # backend:
+  #   build:
+  #     context: ../backend
+  #   container_name: backend
+  #   ports:
+  #     - "8081:8081"
+  #   volumes:
+  #     - ./backend/uploads:/app/uploads
 
-  frontend:
-    build:
-      context: ../frontend
-    container_name: frontend
+  # frontend:
+  #   build:
+  #     context: ../frontend
+  #   container_name: frontend
 
-    ports:
-      - "8080:80"
-    environment:
-      - VITE_BACKEND_URL=http://localhost:8081
+  #   ports:
+  #     - "8080:80"
+  #   environment:
+  #     - VITE_BACKEND_URL=http://localhost:8081
 
 
   mariadb:

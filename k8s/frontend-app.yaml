@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-register-deployment
+  
+  labels:
+    app: frontend-register
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-register
+  template:
+    metadata:
+      labels:
+        app: frontend-register
+    spec:
+      containers:
+        - name: frontend-register
+          image: jtiradoxxx/frontend-register:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: VITE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: frontend-config
+                  key: VITE_HOST
+            - name: VITE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: frontend-config
+                  key: VITE_PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-register-service
+  
+spec:
+  selector:
+    app: frontend-register
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

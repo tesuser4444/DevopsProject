@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Configurar base de datos (usa .env para credenciales sensibles)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://user:password@db/registration_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://user:password@192.168.100.28/registration_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = './uploads'
 

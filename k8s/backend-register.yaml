@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-register-deployment
+  labels:
+    app: backend-register
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-register
+  template:
+    metadata:
+      labels:
+        app: backend-register
+    spec:
+      containers:
+        - name: backend-register
+          image: jtiradoxxx/backend-register:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: FLASK_APP
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: FLASK_APP
+            - name: FLASK_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: FLASK_ENV
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-register-service
+  
+spec:
+  selector:
+    app: backend-register
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
