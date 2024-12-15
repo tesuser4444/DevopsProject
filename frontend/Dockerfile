@@ -14,7 +14,7 @@ COPY . .
 # Build the React app
 
 # Expose the app on port 3000
-EXPOSE 3000
+EXPOSE 8080
 
 # Run the React app
-CMD ["npm", "run" , "dev"]
+CMD ["npm", "run", "dev", "--", "--host"]

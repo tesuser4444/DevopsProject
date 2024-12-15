@@ -1,5 +1,5 @@
 # Use the official Python image
-FROM python:3.9-slim
+FROM python:3.12
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -23,7 +23,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port
-EXPOSE 5000
+EXPOSE 8081
 
 # Run the app
 CMD ["python", "app.py"]
