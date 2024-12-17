@@ -7,12 +7,11 @@ ENV PYTHONUNBUFFERED=1
 # Install required system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
-    libmariadb-dev \
-    libmariadb-dev-compat \
+    libpq-dev \
     build-essential \
-    default-libmysqlclient-dev \
     pkg-config \
     && apt-get clean
+
 # Set working directory
 WORKDIR /app
 

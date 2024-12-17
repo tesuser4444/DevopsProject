@@ -1,37 +1,36 @@
 services:
-  # backend:
-  #   build:
-  #     context: ../backend
-  #   container_name: backend
-  #   ports:
-  #     - "8081:8081"
-  #   volumes:
-  #     - ./backend/uploads:/app/uploads
+  backend:
+    build:
+      context: ../backend
+    container_name: backend
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./backend/uploads:/app/uploads
 
-  # frontend:
-  #   build:
-  #     context: ../frontend
-  #   container_name: frontend
+  frontend:
+    build:
+      context: ../frontend
+    container_name: frontend
 
-  #   ports:
-  #     - "8080:80"
-  #   environment:
-  #     - VITE_BACKEND_URL=http://localhost:8081
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:8081
 
 
-  mariadb:
-    image: mariadb:10.5
+  postgres:
+    image: postgres:11
     restart: always
     container_name: db
     environment:
-      MARIADB_ROOT_PASSWORD: example
-      MARIADB_DATABASE: registration_db
-      MARIADB_USER: user
-      MARIADB_PASSWORD: password
+      POSTGRES_DB: registration_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  mariadb_data:
+  postgres_data:
