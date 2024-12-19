@@ -1,0 +1,97 @@
+pipeline {
+    agent any
+    
+    environment {
+        TF_VERSION = '1.7.0'
+        AZURE_CREDENTIALS = credentials('azure-service-principal')
+        TF_STATE_STORAGE = 'yourterraformstate'
+        TF_STATE_CONTAINER = 'tfstate'
+        WORKSPACE = 'development'
+    }
+    
+    stages {
+        stage('Install Terraform') {
+            steps {
+                sh """
+                    wget https://releases.hashicorp.com/terraform/\${TF_VERSION}/terraform_\${TF_VERSION}_linux_amd64.zip
+                    unzip terraform_\${TF_VERSION}_linux_amd64.zip
+                    mv terraform /usr/local/bin/
+                    terraform --version
+                """
+            }
+        }
+        
+        stage('Azure Login') {
+            steps {
+                sh """
+                    az login --service-principal \
+                    -u \${AZURE_CREDENTIALS_CLIENT_ID} \
+                    -p \${AZURE_CREDENTIALS_CLIENT_SECRET} \
+                    --tenant \${AZURE_CREDENTIALS_TENANT_ID}
+                """
+            }
+        }
+        
+        stage('Terraform Init') {
+            steps {
+                dir('terraform') {
+                    sh """
+                        export ARM_CLIENT_ID=\${AZURE_CREDENTIALS_CLIENT_ID}
+                        export ARM_CLIENT_SECRET=\${AZURE_CREDENTIALS_CLIENT_SECRET}
+                        export ARM_SUBSCRIPTION_ID=\${AZURE_CREDENTIALS_SUBSCRIPTION_ID}
+                        export ARM_TENANT_ID=\${AZURE_CREDENTIALS_TENANT_ID}
+                        
+                        terraform init \
+                        -backend=true \
+                        -backend-config="storage_account_name=${TF_STATE_STORAGE}" \
+                        -backend-config="container_name=${TF_STATE_CONTAINER}" \
+                        -backend-config="key=${WORKSPACE}/terraform.tfstate"
+                    """
+                }
+            }
+        }
+        
+        stage('Terraform Plan') {
+            steps {
+                dir('terraform') {
+                    sh """
+                        export ARM_CLIENT_ID=\${AZURE_CREDENTIALS_CLIENT_ID}
+                        export ARM_CLIENT_SECRET=\${AZURE_CREDENTIALS_CLIENT_SECRET}
+                        export ARM_SUBSCRIPTION_ID=\${AZURE_CREDENTIALS_SUBSCRIPTION_ID}
+                        export ARM_TENANT_ID=\${AZURE_CREDENTIALS_TENANT_ID}
+                        
+                        terraform plan -out=tfplan -var-file=${WORKSPACE}.tfvars
+                    """
+                }
+            }
+        }
+        
+        stage('Approval') {
+            steps {
+                input message: 'Apply the terraform plan?'
+            }
+        }
+        
+        stage('Terraform Apply') {
+            steps {
+                dir('terraform') {
+                    sh """
+                        export ARM_CLIENT_ID=\${AZURE_CREDENTIALS_CLIENT_ID}
+                        export ARM_CLIENT_SECRET=\${AZURE_CREDENTIALS_CLIENT_SECRET}
+                        export ARM_SUBSCRIPTION_ID=\${AZURE_CREDENTIALS_SUBSCRIPTION_ID}
+                        export ARM_TENANT_ID=\${AZURE_CREDENTIALS_TENANT_ID}
+                        
+                        terraform apply -auto-approve tfplan
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            sh 'az logout'
+            cleanWs()
+        }
+    }
+}
